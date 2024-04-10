@@ -32,4 +32,8 @@ public class GraphNode<T> {
     public Integer getCostTo(GraphNode<T> neighbor) {
         return null;
     }
+
+    public Object getValue() {
+        return null;
+    }
 }

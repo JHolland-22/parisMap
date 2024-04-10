@@ -2,8 +2,11 @@ package com.example.parismapca2;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -18,10 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.example.parismapca2.Driver.parisAPI;
-import static jdk.javadoc.doclet.DocletEnvironment.ModuleMode.API;
-
-public class HelloController {
+public class HelloController implements Initializable {
     @FXML
     private Label welcomeText;
 
@@ -63,7 +63,9 @@ public class HelloController {
 
 
     private ParisAPI parisAPI;
-    private List<String> waypointsList, interestsNames, POI;
+    private List<GraphNode<Route>> waypointsList;
+    private List<String> interestsNames;
+    private List<String> POI;
     private Pixels startPixel, destinationPixel;
     private Circle startCircle, endCircle;
     private Color dijkstraColor, depthColor, breathColor;
@@ -75,11 +77,11 @@ public class HelloController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ParisAPI = parisAPI;
-        this.waypointsList = parisAPI.getWaypointsList();
+        parisAPI = parisAPI;
+        this.waypointsList = parisAPI.getWaypointsList(start.getValue(), destination.getValue());
         this.interestsNames = parisAPI.getPointsOfInterestNames();
         this.POI = parisAPI.getPointsOfInterstList();
-        view.setImage(parisAPI.getGalleryImage());
+        view.setImage(parisAPI.getParisImage());
         //view.setImage(galleryAPI.getBreadthSearchImage());
         mainPane.setPrefHeight(view.getFitHeight());
 
@@ -106,11 +108,11 @@ public class HelloController {
         startCorrdsButton.setToggleGroup(toggleGroup);
         destinationCorrdsButton.setToggleGroup(toggleGroup);
 
-        start.getItems().addAll(galleryAPI.getNames());
-        destination.getItems().addAll(galleryAPI.getNames());
-        avoidRoom.getItems().addAll(galleryAPI.getNames());
-        waypoints.getItems().addAll(galleryAPI.getNames());
-        pointsOfInterest.getItems().addAll(galleryAPI.getPointsOfInterestNames());
+        start.getItems().addAll(parisAPI.getNames());
+        destination.getItems().addAll(parisAPI.getNames());
+        avoidRoom.getItems().addAll(parisAPI.getNames());
+        waypoints.getItems().addAll(parisAPI.getNames());
+        pointsOfInterest.getItems().addAll(parisAPI.getPointsOfInterestNames());
         breadthFirstBox.setVisible(false);
 
         inputTooltip();
@@ -121,10 +123,10 @@ public class HelloController {
     public void setDeadthFirstSearchPixels(MouseEvent e) {
         if (!breadthFirstButton.isSelected()) return;
 
-        int x = (int) ((e.getX() / view.getFitWidth()) * galleryAPI.getBreadthSearchImage().getWidth());
-        int y = (int) ((e.getY() / view.getFitHeight()) * galleryAPI.getBreadthSearchImage().getHeight());
+        int x = (int) ((e.getX() / view.getFitWidth()) * parisAPI.getBreadthSearchImage(startPixel, destinationPixel).getWidth());
+        int y = (int) ((e.getY() / view.getFitHeight()) * parisAPI.getBreadthSearchImage(startPixel, destinationPixel).getHeight());
 
-        if (!galleryAPI.getBreadthSearchImage().getPixelReader().getColor(x, y).equals(Color.BLACK)) {
+        if (!parisAPI.getBreadthSearchImage(startPixel, destinationPixel).getPixelReader().getColor(x, y).equals(Color.BLACK)) {
             if (startCorrdsButton.isSelected()) {
                 startPixel = new Pixels(x, y);
                 startCorrdsLabel.setText("X: " + x + " Y: " + y);
@@ -148,70 +150,86 @@ public class HelloController {
 
 
     public void addWaypoint() {
-        if (galleryAPI.getWaypointsList().contains(waypoints.getValue())) return;
+        if (parisAPI.getWaypointsList(start.getValue(), destination.getValue()).contains(waypoints.getValue())) return;
         if (waypoints.getValue() == null) return;
         waypointView.getItems().addAll(waypoints.getValue());
         waypointsList.add(waypoints.getValue());
     }
 
     public void addInterest() {
-        if (galleryAPI.getPointsOfInterstList().contains(pointsOfInterest.getValue())) return;
+        if (parisAPI.getPointsOfInterstList().contains(pointsOfInterest.getValue())) return;
         if (pointsOfInterest.getValue() == null) return;
         interestsView.getItems().addAll(pointsOfInterest.getValue());
-        galleryAPI.getPointsOfInterstList().add(pointsOfInterest.getValue());
+        parisAPI.getPointsOfInterstList().add(pointsOfInterest.getValue());
     }
 
-    public void findDepthpath(ActionEvent actionEvent) {
-        List<GraphNode<?>> newPath;
-        if (!waypointsList.isEmpty()) {
-            newPath = galleryAPI.waypointSupport(start.getValue(), destination.getValue(), Algo.Depth);
-        } else if (!POI.isEmpty()) {
-            newPath = galleryAPI.interestsSupport(start.getValue(), destination.getValue(), Algo.Depth);
-        } else {
-            CostOfPath cp = Graph.searchGraphDepthFirstCheapestPath(galleryAPI.findGraphNode(start.getValue()), null, 0, galleryAPI.findGraphNode(destination.getValue()).data);
+    public void findDepthPath(ActionEvent actionEvent) {
+        List<GraphNode<Route>> newPath = null; // Initialize newPath to null to handle the case where no conditions are met.
 
-            newPath = cp.pathList;
+        // Check if waypointsList is not empty and use waypoint support to find a new path
+        if (!waypointsList.isEmpty()) {
+            newPath = parisAPI.getWaypointsList(start.getValue(), destination.getValue());
         }
-        drawSinglePath(newPath, depthColor);
+        // If waypointsList is empty but POI is not, use interests support to find a new path
+        else if (!POI.isEmpty()) {
+            newPath = parisAPI.interestsSupport(start.getValue(), destination.getValue());
+        }
+        // If both waypointsList and POI are empty, newPath remains null
 
+        // If a new path was found, draw it
+        if (newPath != null) {
+            drawSinglePath(newPath, depthColor);
+        } else {
+            // Handle the case where no path was found. You might want to log an error or inform the user.
+            System.out.println("No path found.");
+        }
     }
 
-    public void findAllDepthpaths(ActionEvent actionEvent) {
-        List<List<GraphNode<?>>> t;
-        if (!waypointsList.isEmpty()) {
-            //pathList = galleryAPI.waypointSupport(findRoom((ArrayList<Room>) galleryAPI.getRooms(), start.getValue()), findRoom((ArrayList<Room>) galleryAPI.getRooms(), destination.getValue()), waypointsList.get, galleryAPI.getRoomNodes(), galleryAPI.getRooms());
-        } else {
-            t = Graph.findAllPathsDepthFirst(galleryAPI.findGraphNode(start.getValue()), null, galleryAPI.findGraphNode(destination.getValue()).data);
-            TreeItem<String> root = new TreeItem<>("Routes");
-            int counter = 0;
-            int route = 1;
-            for (List<GraphNode<?>> list : t) {
-                if (counter >= permLimit) break;
-                TreeItem<String> item = new TreeItem<>("Route " + route);
-                for (GraphNode<?> node : list) {
-                    Route route = (Route) node.data;
-                    TreeItem<String> subItem = new TreeItem<>(route.getRouteName());
-                    item.getChildren().add(subItem);
 
-                }
-                root.getChildren().add(item);
-                counter++;
-                route++;
+
+    public void findAllDepthPaths(ActionEvent actionEvent) {
+        TreeItem<String> root = new TreeItem<>("Routes");
+        int routeCounter = 1;
+
+        List<List<GraphNode<Route>>> allPaths;
+
+        if (!waypointsList.isEmpty()) {
+            // Ensure waypointsList is of type List<GraphNode<Route>> and correctly initialized
+            allPaths = parisAPI.findAllPathsUsingWaypoints(start.getValue(), destination.getValue(), waypointsList);
+        } else {
+            // Assuming findAllDepthFirstPaths returns List<List<GraphNode<Route>>>
+            allPaths = parisAPI.findAllDepthFirstPaths(start.getValue(), destination.getValue());
+        }
+
+        if (allPaths == null || allPaths.isEmpty()) {
+            permNum.setText("No paths found.");
+            return;
+        }
+
+        for (List<GraphNode<Route>> path : allPaths) {
+            TreeItem<String> routeItem = new TreeItem<>("Route " + routeCounter++);
+            for (GraphNode<Route> node : path) {
+                // Assuming each GraphNode's data can be cast to a Route object.
+                TreeItem<String> routeStep = new TreeItem<>(node.data.getClass().getPackage().getName());
+                routeItem.getChildren().add(routeStep);  // Add each step of the route to the route item.
             }
-            routeTreeView.setRoot(root);
-            routeTreeView.setShowRoot(false);
-            permNum.setText("Total: " + t.size());
+            root.getChildren().add(routeItem);  // Add the complete route to the root item.
         }
 
-
+        // Set the constructed tree as the root for the TreeView and update UI elements accordingly.
+        routeTreeView.setRoot(root);
+        routeTreeView.setShowRoot(false);  // Optionally hide the root item to only show routes.
+        permNum.setText("Total: " + allPaths.size());  // Update a UI element to show the number of paths found.
     }
+
+
 
 
     public void findbreadthpath(ActionEvent actionEvent) {
-        List<GraphNode<Pixel>> pixels = (List<GraphNode<Pixel>>) galleryAPI.breadthFirstSearch(startPixel, destinationPixel);
-        Image image = galleryAPI.getGalleryImage();
+        List<GraphNode<Pixels>> pixels = (List<GraphNode<Pixels>>) parisAPI.getBreadthSearchImage(startPixel, destinationPixel);
+        Image image = parisAPI.getParisImage();
         WritableImage writableImage = new WritableImage(image.getPixelReader(), (int) image.getWidth(), (int) image.getHeight());
-        for (GraphNode<Pixel> p : pixels) {
+        for (GraphNode<Pixels> p : pixels) {
             writableImage.getPixelWriter().setColor(p.data.getXCorrd(), p.data.getYCoord(), breathColor);
         }
         view.setImage(writableImage);
@@ -219,26 +237,23 @@ public class HelloController {
 
 
     public void findPathDij(ActionEvent actionEvent) {
+        List<GraphNode<Route>> pathList = new ArrayList<>();
 
-        List<GraphNode<?>> pathList = new ArrayList<>();
         if (!waypointsList.isEmpty()) {
-            pathList = parisAPI.waypointSupport(start.getValue(), destination.getValue(), Algo.Dijkstra);
-        }
-        else if (!POI.isEmpty()) {
-            pathList = parisAPI.interestsSupport(start.getValue(),destination.getValue(),Algo.Dijkstra);
-        }
-        else {
-            CostOfPath cp = Graph.findCheapestPathDijkstra(galleryAPI.findGraphNode(start.getValue()), galleryAPI.findGraphNode(destination.getValue()).data);
-
-            pathList = cp.pathList;
+            // Assuming parisAPI provides a method to find a path considering waypoints without specifying an algorithm.
+            pathList = parisAPI.getWaypointsList(start.getValue(), destination.getValue());
+        } else if (!POI.isEmpty()) {
+            // Assuming parisAPI provides a method to find a path considering points of interest without specifying an algorithm.
+            pathList = parisAPI.interestsSupport(start.getValue(), destination.getValue());
+        } else {
         }
 
-
+        // Drawing the path with a specified color for Dijkstra's algorithm paths
         drawSinglePath(pathList, dijkstraColor);
-
     }
 
-    public void drawSinglePath(List<GraphNode<?>> pathList, Color c) {
+
+    public void drawSinglePath(List<GraphNode<Route>> pathList, Color c) {
         mainPane.getChildren().clear();
         for (int i = 0; i < pathList.size(); i++) {
             GraphNode<Route> node = (GraphNode<Route>) pathList.get(i);
@@ -257,29 +272,12 @@ public class HelloController {
     }
 
 
-    public void avoidThisRoom() {
-        if (galleryAPI.getAvoidedRooms().contains(galleryAPI.findGraphNode(avoidRoom.getValue()))) return;
-        if (avoidRoom.getValue() == null) return;
-        galleryAPI.avoidRoom(avoidRoom.getValue());
-        avoidView.getItems().add(avoidRoom.getValue());
-    }
 
-    public void resetAvoidedRoom() {
-        galleryAPI.resetAvoidRoom();
-        avoidView.getItems().clear();
-        avoidRoom.getItems().clear();
-        avoidRoom.getItems().addAll(galleryAPI.getNames());
-        avoidRoom.setPromptText("Avoid");
-    }
 
-    public void resetWaypoints() {
-        waypointView.getItems().clear();
-        galleryAPI.getWaypointsList().clear();
-    }
 
     public void clearMap() {
         mainPane.getChildren().clear();
-        view.setImage(galleryAPI.getGalleryImage());
+        view.setImage(parisAPI.getParisImage());
         inputTooltip();
     }
 
@@ -314,11 +312,11 @@ public class HelloController {
 
     public void clearPOI(ActionEvent actionEvent) {
         interestsView.getItems().clear();
-        galleryAPI.getPointsOfInterstList().clear();
+        parisAPI.getPointsOfInterstList().clear();
     }
 
     public void inputTooltip(){
-        for (Circle c : galleryAPI.rectangles){
+        for (Circle c : parisAPI.rectangles){
             mainPane.getChildren().add(c);
         }
     }
@@ -334,4 +332,3 @@ public class HelloController {
 
 
 
-}
