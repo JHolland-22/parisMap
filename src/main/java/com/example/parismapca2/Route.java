@@ -1,4 +1,4 @@
-package parismapca2;
+package com.example.parismapca2;
 
 public class Route {
 

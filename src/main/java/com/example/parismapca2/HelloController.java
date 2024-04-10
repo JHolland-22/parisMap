@@ -13,8 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import parismapca2.Pixels;
-import parismapca2.Route;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -153,7 +151,7 @@ public class HelloController implements Initializable {
         if (parisAPI.getWaypointsList(start.getValue(), destination.getValue()).contains(waypoints.getValue())) return;
         if (waypoints.getValue() == null) return;
         waypointView.getItems().addAll(waypoints.getValue());
-        waypointsList.add(waypoints.getValue());
+        waypointsList.add((GraphNode<Route>) waypointsList);
     }
 
     public void addInterest() {
@@ -162,7 +160,7 @@ public class HelloController implements Initializable {
         interestsView.getItems().addAll(pointsOfInterest.getValue());
         parisAPI.getPointsOfInterstList().add(pointsOfInterest.getValue());
     }
-
+     @FXML
     public void findDepthPath(ActionEvent actionEvent) {
         List<GraphNode<Route>> newPath = null; // Initialize newPath to null to handle the case where no conditions are met.
 
@@ -270,6 +268,60 @@ public class HelloController implements Initializable {
         }
         inputTooltip();
     }
+
+    public void drawMultiplePaths(List<List<GraphNode<Route>>> pathsList, Color c) {
+        mainPane.getChildren().clear();  // Clear the pane to start fresh, remove if you want to keep existing drawings
+
+        // Iterate over each path in the list of paths
+        for (List<GraphNode<Route>> path : pathsList) {
+            // Draw each path using the provided color
+            for (int i = 0; i < path.size() - 1; i++) {  // Use size - 1 to avoid IndexOutOfBoundsException
+                GraphNode<Route> currentNode = path.get(i);
+                GraphNode<Route> nextNode = path.get(i + 1);
+
+                // Create a line from the current node to the next node
+                Line line = new Line(currentNode.data.getXCoord(), currentNode.data.getYCoord(),
+                        nextNode.data.getXCoord(), nextNode.data.getYCoord());
+                line.setStroke(c);  // Set the color of the line
+                line.setStrokeWidth(5);  // Set the width of the line
+
+                mainPane.getChildren().add(line);  // Add the line to the main pane
+            }
+        }
+
+        inputTooltip();  // Refresh tooltips or perform additional actions after drawing
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,5 +1,5 @@
 
-package parismapca2;
+package com.example.parismapca2;
 
 import java.util.Objects;
 

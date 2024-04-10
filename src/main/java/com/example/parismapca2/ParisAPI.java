@@ -5,8 +5,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import parismapca2.Pixels;
-import parismapca2.Route;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -410,7 +408,7 @@ public class ParisAPI {
         return false;
     }
 
-    public List<List<GraphNode<?>>> findAllPathsUsingWaypoints(String startValue, String endValue, List<GraphNode<Route>> waypointsList) {
+    public List<List<GraphNode<Route>>> findAllPathsUsingWaypoints(String startValue, String endValue, List<GraphNode<Route>> waypointsList) {
         // Convert startValue and endValue to GraphNodes
         GraphNode<Route> startNode = findGraphNode(startValue);
         GraphNode<Route> endNode = findGraphNode(endValue);
@@ -450,28 +448,32 @@ public class ParisAPI {
 
 
 
-    public List<List<GraphNode<?>>> findAllDepthFirstPaths(String startValue, String endValue) {
-        GraphNode<?> startNode = findGraphNode(startValue); // Method to find the start node based on its value
-        GraphNode<?> endNode = findGraphNode(endValue); // Method to find the end node based on its value
+    public List<List<GraphNode<Route>>> findAllDepthFirstPaths(String startValue, String endValue) {
+        // Ensure findGraphNode returns GraphNode<Route> to match the expected type
+        GraphNode<Route> startNode = findGraphNode(startValue);
+        GraphNode<Route> endNode = findGraphNode(endValue);
 
-        List<List<GraphNode<?>>> allPaths = new ArrayList<>(); // To store all the paths found
-        depthFirstSearch(startNode, endNode, new HashSet<>(), new ArrayList<>(), allPaths); // Begin the DFS
+        // Use a list of lists of GraphNode<Route> to match the expected return type
+        List<List<GraphNode<Route>>> allPaths = new ArrayList<>();
+        // Pass an empty list for the current path and an empty set for visited nodes
+        depthFirstSearch(startNode, endNode, new HashSet<>(), new ArrayList<>(), allPaths);
 
-        return allPaths; // Return all the paths found
+        return allPaths;
     }
 
-    private void depthFirstSearch(GraphNode<?> currentNode, GraphNode<?> endNode, Set<GraphNode<?>> visited, List<GraphNode<?>> currentPath, List<List<GraphNode<?>>> allPaths) {
-        visited.add(currentNode); // Mark the current node as visited
-        currentPath.add(currentNode); // Add the current node to the current path
+
+    private void depthFirstSearch(GraphNode<Route> currentNode, GraphNode<Route> endNode, Set<GraphNode<Route>> visited, List<GraphNode<Route>> currentPath, List<List<GraphNode<Route>>> allPaths) {
+        visited.add(currentNode);  // Mark the current node as visited
+        currentPath.add(currentNode);  // Add the current node to the current path
 
         if (currentNode.equals(endNode)) {
-            // If the current node is the end node, add the current path to the list of all paths
+            // If the current node is the end node, add a copy of the current path to the list of all paths
             allPaths.add(new ArrayList<>(currentPath));
         } else {
             // Otherwise, continue the search with each neighbor
             for (GraphNode<?> neighbor : getNeighbors(currentNode)) {
                 if (!visited.contains(neighbor)) {
-                    depthFirstSearch(neighbor, endNode, visited, currentPath, allPaths);
+                    depthFirstSearch((GraphNode<Route>) neighbor, endNode, visited, currentPath, allPaths);
                 }
             }
         }
@@ -480,6 +482,7 @@ public class ParisAPI {
         visited.remove(currentNode);
         currentPath.remove(currentPath.size() - 1);
     }
+
     // Placeholder for the method to get the neighbors of a GraphNode
     private List<GraphNode<?>> getNeighbors(GraphNode<?> node) {
         // Implementation depends on your data structure
