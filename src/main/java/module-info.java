@@ -6,4 +6,6 @@ module com.example.parismapca2 {
 
     opens com.example.parismapca2 to javafx.fxml;
     exports com.example.parismapca2;
+    exports parismapca2;
+    opens parismapca2 to javafx.fxml;
 }

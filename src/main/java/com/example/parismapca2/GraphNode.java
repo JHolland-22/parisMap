@@ -1,6 +1,8 @@
 package com.example.parismapca2;
 
 
+import parismapca2.Route;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,5 +23,13 @@ public class GraphNode<T> {
     public void connectToNodeUndirected(GraphNode<T> destNode,int cost) {
         adjList.add( new GraphLink(destNode,cost) ); //Add new link object to source adjacency list
         destNode.adjList.add( new GraphLink(this,cost) ); //Add new link object to destination adjacency list
+    }
+
+    public GraphNode<Route>[] getNeighbors() {
+        return new GraphNode[0];
+    }
+
+    public Integer getCostTo(GraphNode<T> neighbor) {
+        return null;
     }
 }
