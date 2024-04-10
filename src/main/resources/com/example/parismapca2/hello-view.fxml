@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="603.0" prefWidth="786.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button layoutX="20.0" layoutY="509.0" mnemonicParsing="false" text="Single Valid Route" />
+      <Button layoutX="20.0" layoutY="557.0" mnemonicParsing="false" text="Avoid " />
+      <Button layoutX="182.0" layoutY="510.0" mnemonicParsing="false" text="Multiple Valid Route" />
+      <Button layoutX="182.0" layoutY="557.0" mnemonicParsing="false" text="Shortest route" />
+      <ChoiceBox layoutX="360.0" layoutY="522.0" prefWidth="150.0" />
+      <ImageView fitHeight="377.0" fitWidth="452.0" layoutX="32.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="135.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="302.0" AnchorPane.topAnchor="91.0">
+         <image>
+            <Image url="@../../../../../../../../../PARISSS.png" />
+         </image>
+      </ImageView>
+      <ChoiceBox layoutX="593.0" layoutY="522.0" prefWidth="150.0" />
+   </children>
+</AnchorPane>
