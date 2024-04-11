@@ -372,6 +372,25 @@ public class HelloController implements Initializable {
             mainPane.getChildren().add(c);
         }
     }
+
+    public void avoidThisRoom(ActionEvent event) {
+    }
+
+    public void resetAvoidedRoom(ActionEvent event) {
+
+    }
+
+    public void resetWaypoints(ActionEvent event) {
+
+    }
+
+    public void findDepthpath(ActionEvent event) {
+
+    }
+
+    public void findAllDepthpaths(ActionEvent event) {
+
+    }
 }
 
 

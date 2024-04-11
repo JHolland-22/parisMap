@@ -1,24 +1,219 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.image.Image?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="590.0" prefWidth="934.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.parismapca2.HelloController">
-   <children>
-      <Button layoutX="20.0" layoutY="509.0" mnemonicParsing="false" onAction="#findDepthPath"
-              text="Single Valid Route"/>
-      <Button layoutX="20.0" layoutY="557.0" mnemonicParsing="false" text="Avoid " />
-      <Button layoutX="182.0" layoutY="510.0" mnemonicParsing="false" onAction="#findAllDepthPaths" text="Multiple Valid Route"  />
-      <Button layoutX="182.0" layoutY="557.0" mnemonicParsing="false" text="Shortest route" />
-      <ChoiceBox layoutX="360.0" layoutY="522.0" prefWidth="150.0" />
-      <ImageView fitHeight="377.0" fitWidth="452.0" layoutX="32.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="135.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="302.0" AnchorPane.topAnchor="91.0">
-         <image>
-            <Image url="@../../../../../../../../../PARISSS.png" />
-         </image>
-      </ImageView>
-      <ChoiceBox layoutX="593.0" layoutY="522.0" prefWidth="150.0" />
-   </children>
-</AnchorPane>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="603.0" prefWidth="786.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.parismapca2.HelloController">
+         <children>
+            <TabPane layoutX="-2.0" prefHeight="600.0" prefWidth="1102.0" tabClosingPolicy="UNAVAILABLE">
+               <tabs>
+                  <Tab text="Paris Route Finder">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="588.0" prefWidth="1102.0">
+                           <children>
+                              <Label alignment="CENTER" layoutX="74.0" layoutY="14.0" prefHeight="61.0" prefWidth="351.0" text="Paris Route Finder" textAlignment="CENTER" wrapText="true">
+                                 <font>
+                                    <Font size="26.0" />
+                                 </font>
+                              </Label>
+                              <ImageView fx:id="view" fitHeight="420.0" fitWidth="418.0" layoutX="40.0" layoutY="96.0" onMouseClicked="#setDeadthFirstSearchPixels" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: black;" />
+                              <Label fx:id="fileName1" layoutX="76.0" layoutY="87.0" prefHeight="17.0" prefWidth="81.0" />
+                              <Label fx:id="fileSize1" layoutX="76.0" layoutY="113.0" prefHeight="17.0" prefWidth="65.0" />
+                              <AnchorPane fx:id="mainPane" layoutX="40.0" layoutY="96.0" onMouseClicked="#setDeadthFirstSearchPixels" prefHeight="420.0" prefWidth="416.0">
+                              </AnchorPane>
+                              <VBox layoutX="502.0" layoutY="4.0" prefHeight="573.0" prefWidth="594.0">
+                                 <children>
+                                    <HBox prefHeight="218.0" prefWidth="594.0" spacing="10.0">
+                                       <children>
+                                          <VBox prefHeight="191.0" prefWidth="150.0" spacing="5.0">
+                                             <children>
+                                                <Label text="Route Selector" textFill="#9f9f9f">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="Start" />
+                                                <ComboBox fx:id="start" prefWidth="150.0" promptText="Start" />
+                                                <Label text="Destination" />
+                                                <ComboBox fx:id="destination" prefWidth="150.0" promptText="Destination" />
+                                             </children>
+                                          </VBox>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <VBox prefHeight="191.0" prefWidth="200.0" spacing="5.0">
+                                             <children>
+                                                <Label text="Avoid" textFill="#9f9f9f">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="avoidRoom" prefHeight="25.0" prefWidth="106.0" promptText="Avoid" />
+                                                <HBox prefHeight="4.0" prefWidth="100.0" spacing="5.0">
+                                                   <children>
+                                                      <Button mnemonicParsing="false" onAction="#avoidThisRoom" prefWidth="57.0" text="Add" />
+                                                      <Button mnemonicParsing="false" onAction="#resetAvoidedRoom" prefWidth="57.0" text="Clear" />
+                                                   </children>
+                                                </HBox>
+                                                <ListView fx:id="avoidView" prefHeight="72.0" prefWidth="197.0" />
+                                             </children>
+                                          </VBox>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <VBox prefHeight="200.0" prefWidth="200.0" spacing="5.0">
+                                             <children>
+                                                <Label text="Waypoints" textFill="#9f9f9f">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="waypoints" prefHeight="26.0" prefWidth="118.0" promptText="Waypoints" />
+                                                <HBox prefHeight="0.0" prefWidth="100.0" spacing="5.0">
+                                                   <children>
+                                                      <Button mnemonicParsing="false" onAction="#addWaypoint" prefHeight="26.0" prefWidth="57.0" text="Add" />
+                                                      <Button mnemonicParsing="false" onAction="#resetWaypoints" prefHeight="26.0" prefWidth="57.0" text="Clear" />
+                                                   </children>
+                                                </HBox>
+                                                <ListView fx:id="waypointView" prefHeight="72.0" prefWidth="197.0" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                    <Separator prefWidth="200.0" />
+                                    <HBox prefHeight="266.0" prefWidth="594.0" spacing="10.0">
+                                       <children>
+                                          <VBox prefHeight="176.0" prefWidth="200.0" spacing="5.0">
+                                             <children>
+                                                <Label prefHeight="27.0" prefWidth="145.0" text="Points of Interest" textFill="#9f9f9f">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="pointsOfInterest" prefWidth="150.0" promptText="Most Interesting" />
+                                                <HBox prefHeight="13.0" prefWidth="100.0" spacing="5.0">
+                                                   <children>
+                                                      <Button mnemonicParsing="false" onAction="#addInterest" prefHeight="25.0" prefWidth="58.0" text="Add" />
+                                                      <Button mnemonicParsing="false" onAction="#clearPOI" prefHeight="25.0" prefWidth="59.0" text="Clear" />
+                                                   </children>
+                                                </HBox>
+                                                <ListView fx:id="interestsView" prefHeight="111.0" prefWidth="200.0" />
+                                             </children>
+                                          </VBox>
+                                          <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                          <VBox prefHeight="207.0" prefWidth="174.0">
+                                             <children>
+                                                <Label text="Depth-First List" textFill="#9f9f9f">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <TreeView fx:id="routeTreeView" prefHeight="157.0" prefWidth="174.0" />
+                                                <HBox prefHeight="28.0" prefWidth="174.0" spacing="10.0">
+                                                   <children>
+                                                      <Label fx:id="permNum" text="Label" />
+                                                      <Label fx:id="permLimitLabel" text="Label" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                          <Separator layoutX="220.0" layoutY="10.0" orientation="VERTICAL" prefHeight="200.0" />
+                                          <VBox prefHeight="220.0" prefWidth="162.0" spacing="2.0">
+                                             <children>
+                                                <Label text="Settings" textFill="#9f9f9f">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="Route Limit" />
+                                                <HBox prefHeight="22.0" prefWidth="100.0" spacing="5.0">
+                                                   <children>
+                                                      <TextField fx:id="permChangeLimit" prefHeight="25.0" prefWidth="57.0" />
+                                                      <Button mnemonicParsing="false" onAction="#changePermLimit" text="Set" />
+                                                   </children>
+                                                </HBox>
+                                                <Label text="Dijkstras Path Colour" />
+                                                <ColorPicker fx:id="dijkstrasColorPicker" onAction="#changeDijstrasColor" />
+                                                <Label layoutX="10.0" layoutY="79.0" text="Depth-First Path Colour" />
+                                                <ColorPicker fx:id="depthColorPicker" layoutX="10.0" layoutY="96.0" onAction="#changeDepthColor" />
+                                                <Label layoutX="10.0" layoutY="121.0" text="Breadth-First PAth Colour" />
+                                                <ColorPicker fx:id="breadthColorPicker" layoutX="10.0" layoutY="138.0" onAction="#changeBreadthColor" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                    <Separator layoutX="10.0" layoutY="201.0" prefWidth="200.0" />
+                                    <VBox prefHeight="142.0" prefWidth="594.0" spacing="5.0">
+                                       <children>
+                                          <Label text="Algorithms" textFill="#9f9f9f">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox prefHeight="36.0" prefWidth="593.0" spacing="10.0">
+                                             <children>
+                                                <Button mnemonicParsing="false" onAction="#findPathDij" text="Dijkstras" />
+                                                <VBox prefHeight="50.0" prefWidth="116.0" spacing="3.0">
+                                                   <children>
+                                                      <Button mnemonicParsing="false" onAction="#findDepthpath" text="Depth-First Search" />
+                                                      <Button mnemonicParsing="false" onAction="#findAllDepthpaths" prefHeight="1.0" prefWidth="116.0" text="All Depth First" />
+                                                   </children>
+                                                </VBox>
+                                                <VBox spacing="5.0">
+                                                   <children>
+                                                      <ToggleButton fx:id="breadthFirstButton" mnemonicParsing="false" onAction="#showBreadthSearchBox" text="Breadth-First Search" />
+                                                      <VBox fx:id="breadthFirstBox" prefHeight="105.0" prefWidth="175.0" spacing="10.0" style="-fx-border-color: #9f9f9f;">
+                                                         <children>
+                                                            <HBox prefHeight="16.0" prefWidth="147.0" spacing="55.0">
+                                                               <children>
+                                                                  <ToggleButton fx:id="startCorrdsButton" mnemonicParsing="false" text="Start" />
+                                                                  <Label fx:id="startCorrdsLabel" />
+                                                               </children>
+                                                            </HBox>
+                                                            <HBox layoutX="10.0" layoutY="10.0" prefHeight="16.0" prefWidth="147.0" spacing="20.0">
+                                                               <children>
+                                                                  <ToggleButton fx:id="destinationCorrdsButton" mnemonicParsing="false" text="Destination" />
+                                                                  <Label fx:id="destinationCorrdsLabel" />
+                                                               </children>
+                                                            </HBox>
+                                                            <HBox prefHeight="100.0" prefWidth="200.0">
+                                                               <children>
+                                                                  <Button mnemonicParsing="false" onAction="#findbreadthpath" text="Calculate" />
+                                                               </children>
+                                                               <padding>
+                                                                  <Insets left="40.0" />
+                                                               </padding>
+                                                            </HBox>
+                                                         </children>
+                                                         <padding>
+                                                            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                                         </padding>
+                                                      </VBox>
+                                                   </children>
+                                                </VBox>
+                                                <Button mnemonicParsing="false" onAction="#clearMap" text="Clear Map" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
+         </children>
+      </AnchorPane>
